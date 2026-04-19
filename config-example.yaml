@@ -95,4 +95,5 @@ unix_socket_permission: "0770"
 metrics_listen_addr: 127.0.0.1:9090
 
 # Node update check interval
-node_update_check_interval: 10s
+# Increased from 10s to 30s to reduce noise in logs during local testing
+node_update_check_interval: 30s
