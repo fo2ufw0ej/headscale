@@ -70,6 +70,7 @@ dns_config:
   override_local_dns: true
   nameservers:
     - 1.1.1.1
+    - 8.8.8.8  # added Google DNS as fallback
   domains: []
   magic_dns: true
   base_domain: example.com
