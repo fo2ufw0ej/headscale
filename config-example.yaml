@@ -59,7 +59,7 @@ tls_key_path: ""
 
 # Logging
 log:
-  level: info
+  level: debug  # changed from info to debug for easier local troubleshooting
   format: text
 
 # ACL policy path
