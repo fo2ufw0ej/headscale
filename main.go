@@ -85,7 +85,12 @@ func runServer(cmd *cobra.Command, args []string) error {
 	}
 
 	if configFile == "" {
-		configFile = "/etc/headscale/config.yaml"
+		// Check XDG config dir before falling back to /etc, friendlier for local dev
+		if xdgConfig := os.Getenv("XDG_CONFIG_HOME"); xdgConfig != "" {
+			configFile = xdgConfig + "/headscale/config.yaml"
+		} else {
+			configFile = "/etc/headscale/config.yaml"
+		}
 		log.Info().
 			Str("config", configFile).
 			Msg("No config file specified, using default")
