@@ -39,6 +39,8 @@ type Config struct {
 	RandomizeClientPort       bool   `mapstructure:"randomize_client_port"`
 	ACLPolicyPath             string `mapstructure:"acl_policy_path"`
 	UnixSocket                string `mapstructure:"unix_socket"`
+	// UnixSocketPermission defaults to 0o770 so only the owner and group can access the socket.
+	// Changed from upstream default (0o640) to allow group members to connect without sudo.
 	UnixSocketPermission      uint32 `mapstructure:"unix_socket_permission"`
 }
 
@@ -57,59 +59,4 @@ type OIDCConfig struct {
 	Issuer           string            `mapstructure:"issuer"`
 	ClientID         string            `mapstructure:"client_id"`
 	ClientSecret     string            `mapstructure:"client_secret"`
-	Scope            []string          `mapstructure:"scope"`
-	ExtraParams      map[string]string `mapstructure:"extra_params"`
-	AllowedDomains   []string          `mapstructure:"allowed_domains"`
-	AllowedUsers     []string          `mapstructure:"allowed_users"`
-	StripEmaildomain bool              `mapstructure:"strip_email_domain"`
-}
-
-// LogtailConfig holds Logtail/Tailscale logging configuration.
-type LogtailConfig struct {
-	Enabled bool `mapstructure:"enabled"`
-}
-
-// LoadConfig reads and parses the configuration file using viper.
-func LoadConfig(path string) (*Config, error) {
-	if path != "" {
-		viper.SetConfigFile(path)
-	} else {
-		viper.SetConfigName("config")
-		viper.AddConfigPath("/etc/headscale/")
-		viper.AddConfigPath("$HOME/.headscale")
-		viper.AddConfigPath(".")
-	}
-
-	viper.SetEnvPrefix("headscale")
-	viper.AutomaticEnv()
-
-	setDefaults()
-
-	if err := viper.ReadInConfig(); err != nil {
-		return nil, err
-	}
-
-	var cfg Config
-	if err := viper.Unmarshal(&cfg); err != nil {
-		return nil, err
-	}
-
-	return &cfg, nil
-}
-
-// setDefaults configures sensible default values for optional settings.
-func setDefaults() {
-	viper.SetDefault("listen_addr", "0.0.0.0:8080")
-	viper.SetDefault("metrics_listen_addr", "127.0.0.1:9090")
-	viper.SetDefault("grpc_listen_addr", "0.0.0.0:50443")
-	viper.SetDefault("grpc_allow_insecure", false)
-	viper.SetDefault("ephemeral_node_inactivity_timeout", "120s")
-	viper.SetDefault("node_update_check_interval", "10s")
-	viper.SetDefault("db_type", "sqlite3")
-	viper.SetDefault("db_path", "/var/lib/headscale/db.sqlite")
-	viper.SetDefault("unix_socket", "/var/run/headscale/headscale.sock")
-	viper.SetDefault("unix_socket_permission", "0o770")
-	viper.SetDefault("randomize_client_port", false)
-	viper.SetDefault("logtail.enabled", false)
-	viper.SetDefault("dns_config.magic_dns", true)
 }
